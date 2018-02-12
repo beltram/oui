@@ -4,13 +4,14 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
-import org.springframework.boot.test.context.SpringBootTest.WebEnvironment.RANDOM_PORT
 import org.springframework.test.context.junit.jupiter.SpringExtension
 import oui.service.BoxService.Box
+import reactor.test.StepVerifier.Step
+import reactor.test.expectError
 import reactor.test.test
 
+@SpringBootTest
 @ExtendWith(SpringExtension::class)
-@SpringBootTest(webEnvironment = RANDOM_PORT)
 class BoxServiceTest {
 
     @Autowired
@@ -19,15 +20,24 @@ class BoxServiceTest {
     @Test
     fun `optimize with default sequence should optimize`() {
         boxService.optimize("163841689525773").test()
-                .expectNext(Box(9, 1), Box(8, 2), Box(8, 1), Box(7, 3), Box(7, 3), Box(6, 4), Box(6), Box(5, 5))
+                .expectBox(9, 1)
+                .expectBox(8, 2)
+                .expectBox(8, 1)
+                .expectBox(7, 3)
+                .expectBox(7, 3)
+                .expectBox(6, 4)
+                .expectBox(6)
+                .expectBox(5, 5)
                 .expectComplete()
                 .verify()
     }
+
     @Test
-    fun `optimize with blank sequence should throw exception`() {
+    fun `optimize with blank sequence should throw illegal argument exception`() {
         boxService.optimize("").test()
-                .expectNext(Box(9, 1), Box(8, 2), Box(8, 1), Box(7, 3), Box(7, 3), Box(6, 4), Box(6), Box(5, 5))
-                .expectComplete()
+                .expectError(IllegalArgumentException::class)
                 .verify()
     }
+
+    fun Step<Box>.expectBox(vararg items: Int) = expectNext(Box(items.toMutableList()))
 }

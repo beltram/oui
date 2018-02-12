@@ -1,4 +1,8 @@
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
+import org.junit.platform.console.options.Details
+import org.junit.platform.console.options.Details.VERBOSE
+import org.junit.platform.gradle.plugin.JUnitPlatformExtension
+import org.junit.platform.gradle.plugin.JUnitPlatformPlugin
 
 buildscript {
     repositories {
@@ -36,6 +40,11 @@ tasks {
     }
 }
 
+configure<JUnitPlatformExtension> {
+    details = VERBOSE
+}
+
+
 repositories {
     jcenter()
     mavenCentral()
@@ -43,10 +52,14 @@ repositories {
 }
 
 dependencies {
-    compile("org.springframework.boot:spring-boot-starter-web") {
+    compile("org.springframework.boot:spring-boot-starter-webflux") {
         exclude(module = "spring-boot-starter-tomcat")
     }
     compile("org.springframework.boot:spring-boot-starter-reactor-netty")
+    compile("io.projectreactor.ipc:reactor-netty")
+    compile("org.springframework:spring-context")
+    compile("io.netty:netty-buffer")
+    compile("com.fasterxml.jackson.core:jackson-databind")
     compile("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
     compile("org.jetbrains.kotlin:kotlin-reflect")
     compile("com.fasterxml.jackson.module:jackson-module-kotlin")
@@ -56,5 +69,5 @@ dependencies {
     testCompile("org.junit.jupiter:junit-jupiter-api")
     testCompile("io.projectreactor:reactor-test")
     testRuntime("org.junit.jupiter:junit-jupiter-engine")
+    testCompile("org.springframework.security:spring-security-test")
 }
-
